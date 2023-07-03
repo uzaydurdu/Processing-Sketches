@@ -1,2 +1,2 @@
-# Processing-Sketchs
-A variety of algorithms for the manipulation and generating sketchy versions of images
+# Processing-Sketches
+A variety of algorithms for manipulating images and generating sketchy versions of them
