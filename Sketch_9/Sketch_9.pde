@@ -61,26 +61,62 @@ PImage toonShade(PImage img, PImage depth, PImage nmap) {
   // 6) Paint the lines onto the blended image from step 3 by iterating over the image and checking
   //    for black pixels.
 
+  
   PImage res = background.copy();
 
   PImage tempImage = img.copy();
+  PImage tempImageImg = createEdgesCanny(img, clow, chigh).copy();
+
+  PImage resR = selectChannel(nmap, 0);
+  PImage resG = selectChannel(nmap, 1);
+  PImage resB = selectChannel(nmap, 2);
+  resR = createEdgesCanny(resR, clow, chigh).copy();
+  resG = createEdgesCanny(resG, clow, chigh).copy();
+  resB = createEdgesCanny(resB, clow, chigh).copy();
+  //PImage resCanny = createEdgesCanny(img, clow, chigh).copy();
+  PImage outline = createEdgesCanny(depth, clow, chigh).copy();
+
+  outline.filter(ERODE);
 
   for (int y = 0; y < tempImage.height; ++y) {
     for (int x = 0; x < tempImage.width; ++x) {
       if (brightness(tempImage.pixels[x+y*tempImage.width]) != 255.0) {
         tempImage.pixels[x+y*tempImage.width] = quantizeColor(tempImage.pixels[x+y*tempImage.width]);
       } else {
-        tempImage.pixels[x+y*tempImage.width] = color(255.0/2,255.0/2,255.0/2,255.0);
+        tempImage.pixels[x+y*tempImage.width] = color(255.0/2, 255.0/2, 255.0/2, 255.0);
       }
     }
   }
 
-  res.blend(tempImage, 0, 0, res.width, res.height, 0, 0, tempImage.width, tempImage.height, BLEND);
-
-  PImage outline = createEdgesCanny(depth, 4, 14);
-  outline.filter(ERODE);
+  res.blend(tempImage, 0, 0, res.width, res.height, 0, 0, tempImage.width, tempImage.height, OVERLAY);
+  res.blend(outline, 0, 0, res.width, res.height, 0, 0, outline.width, outline.height, MULTIPLY);
 
 
+  for (int y = 0; y < tempImage.height; ++y) {
+    for (int x = 0; x < tempImage.width; ++x) {
+
+      float tempR = resR.pixels[x+y*resR.width];
+      float tempG = resG.pixels[x+y*resG.width];
+      float tempB = resB.pixels[x+y*resB.width];
+      float resCannyBri = brightness(outline.pixels[x+y*outline.width]);
+      float resultImageBri = brightness(tempImageImg.pixels[x+y*tempImageImg.width]);
+
+      if (tempR<tempG && tempR<tempB) {
+
+        res.pixels[x+y*res.width] = color(0, 0, 0, 255.0);
+      } else if (tempG<tempR && tempG<tempB) {
+
+        res.pixels[x+y*res.width] =  color(0, 0, 0, 255.0);
+      } else if (tempB<tempR && tempB<tempG) {
+
+        res.pixels[x+y*res.width] = color(0, 0, 0, 255.0);
+      }
+
+      if (resCannyBri < resultImageBri) {
+        res.pixels[x+y*res.width] = color(0, 0, 0, 255.0);
+      }
+    }
+  }
   return res;
 }
 
