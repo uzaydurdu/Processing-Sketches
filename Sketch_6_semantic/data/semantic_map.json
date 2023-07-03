@@ -1,0 +1,21 @@
+{
+    "semantic_map_filename": "semantic_map_big.png",
+    "semantic_data": [
+	{
+	    "class": "flower",
+	    "color": [0, 255, 0],
+	    "style": "thin"
+	},
+	{
+	    "class": "leaves",
+	    "color": [255, 0, 0],
+	    "style": "lines"
+	},
+	{
+	    "class": "background",
+	    "color": [0, 0, 255],
+	    "style": "thick"
+	}
+    ]
+}
+	
